@@ -1,0 +1,22 @@
+{
+	"version": 2,
+	"env": {
+		"JWT_SECRET": "@jwt_secret",
+		"MONGO_URI": "@invest_trade_mongo_uri",
+		"NEST_PORT": "@invest_trade_port",
+		"NODE_ENV": "@invest_trade_node"
+	},
+	"builds": [
+		{
+			"src": "src/main.ts",
+			"use": "@vercel/node"
+		}
+	],
+	"routes": [
+		{
+			"src": "/(.*)",
+			"dest": "src/main.ts",
+			"methods": ["GET", "POST", "DELETE", "PUT"]
+		}
+	]
+}
