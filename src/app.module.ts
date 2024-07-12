@@ -17,6 +17,9 @@ import { WorksModule } from './works/works.module';
 import { BrandService } from './brand/brand.service';
 import { BrandModule } from './brand/brand.module';
 import { OrderModule } from './order/order.module';
+import { InfoModule } from './info/info.module';
+import { CommentsModule } from './comments/comments.module';
+import { CalculationModule } from './calculation/calculation.module';
 
 @Module({
   imports: [
@@ -37,7 +40,10 @@ import { OrderModule } from './order/order.module';
     WorksModule,
     RatingModule,
     BrandModule,
-    OrderModule
+    OrderModule,
+    InfoModule,
+    CommentsModule,
+    CalculationModule
   ],
   controllers: [AppController],
   providers: [AppService],

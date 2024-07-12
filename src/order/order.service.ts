@@ -106,10 +106,6 @@ export class OrderService {
   }
 
 
-  
- 
-
-
   async createOrder(user: UserModel, dto: CreateOrderDto ) {
 
     const { total_count , items } =  dto

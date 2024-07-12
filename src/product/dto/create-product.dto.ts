@@ -1,46 +1,62 @@
-import { Type } from "class-transformer"
 import { IsArray, IsBoolean, IsNumber, IsString } from "class-validator"
 
+export class Adds {
+	@IsString()
+	title: string;
+
+	@IsString()
+  description: string;
+
+	@IsNumber()
+  price: number;
+
+	@IsString()
+  poster: string;
+}
+
 export class Settings {
-  @IsString()
-  name: string
-  @IsString()
-  value: string
+	@IsString()
+	name: string
+	@IsString()
+	value: string
 }
 
 export class CreateProductDto {
-  @IsString()
-  image: string
+	@IsString()
+	slug: string
 
-  @IsBoolean()
-  is_available: boolean
+	@IsString()
+	poster: string
 
-  @IsString()
-  title: string
+	@IsString()
+	title: string
 
-  @IsString()
-  slug: string
+	@IsBoolean()
+	is_available: boolean
 
-  @IsString()
-  description_short: string
+	@IsString()
+	brand: string
+
+	@IsString()
+	description: string
+
+	@IsNumber()
+	rating: number
+
+  @IsNumber()
+  price: number;
+
+	@IsNumber()
+	view_count: number
+
+	@IsArray()
+	details: Settings[]
+  
+	@IsString()
+	category: string;
 
   @IsArray()
-  details: Settings[]
+	add: Adds[]
 
-  @IsString()
-  description_full: string
-
-  @IsArray()
-  @IsString({ each: true })
-  category: string[]
-
-  @IsArray()
-  @IsString({ each: true })
-  add?: string[]
-
-  @IsArray()
-  @IsString({ each: true })
-  brand: string[]
-
-  isSendTelegram?: boolean
+	isSendTelegram?: boolean
 }

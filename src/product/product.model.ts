@@ -1,10 +1,36 @@
-import { prop, Ref } from '@typegoose/typegoose'
+import { Ref, prop } from '@typegoose/typegoose'
 import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses'
-import { AddModel } from 'src/adds/add.model'
-import { BrandModel } from 'src/brand/brand.model'
-import { CategoryModel } from 'src/category/category.model'
+import { UserModel } from 'src/user/user.model';
 
 export interface ProductModel extends Base {}
+
+export class Comments extends TimeStamps {
+	@prop({ ref: () => UserModel })
+  user: Ref<UserModel>
+
+	@prop()
+	comment: string;
+
+	@prop()
+	reply: Comments[]
+
+	@prop({ default: 0 })
+	likes: number
+}
+
+export class Adds {
+	@prop()
+	title: string;
+
+	@prop()
+  description: string;
+
+	@prop()
+  price: number;
+
+	@prop()
+  poster: string;
+}
 
 export class Settings {
 	@prop()
@@ -14,41 +40,44 @@ export class Settings {
 }
 
 export class ProductModel extends TimeStamps {
-	@prop()
-	image: string
-
-	@prop()
-	title: string
-
-	@prop()
-	is_available: boolean
-
-	@prop({ ref: () => BrandModel })
-	brand: Ref<BrandModel>[]
-
-	@prop()
-	description_short: string
-
-	@prop()
-	description_full: string
-
-	@prop({ default: 4.0 })
-	rating?: number
-
-	@prop({ default: 0 })
-	countOpened?: number
-
 	@prop({ unique: true })
 	slug: string
 
 	@prop()
+	poster: string
+
+	@prop()
+	title: string
+
+	@prop({ default: true })
+	is_available: boolean
+
+	@prop()
+	brand: string
+
+	@prop()
+	description: string
+
+	@prop({ default: 4.0 })
+	rating: number
+
+	@prop({ default: 0 })
+	view_count: number
+
+	@prop()
 	details: Settings[]
 
-	@prop({ ref: () => CategoryModel })
-	category: Ref<CategoryModel>[]
+	@prop()
+	comments: Comments[]
 
-	@prop({ ref: () => AddModel })
-	add?: Ref<AddModel>[]
+	@prop()
+	category: string;
+
+	@prop()
+  price: number;
+
+	@prop()
+	add: Adds[]
 
 	@prop({ default: false })
 	isSendTelegram?: boolean

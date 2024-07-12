@@ -12,7 +12,4 @@ export class CreateCategoryDto {
 
   @IsString()
   image: string
-
-
-
 }

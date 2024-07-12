@@ -16,6 +16,11 @@ export class ProductController {
     return this.ProductService.bySlug(slug)
   }
 
+  @Get('calculations')
+  async getCalculationResult(@Body() dto: CreateProductDto) {
+    return this.ProductService.getCalculation(dto);
+  }
+
   @Put('update-count-opened')
   @HttpCode(200)
   async updateCountOpened(@Body('slug') slug: string) {
@@ -35,8 +40,16 @@ export class ProductController {
   }
 
   @Get()
-  async getAll(@Query('searchTerm') searchTerm?: string, @Query('page') page?: string, @Query('orderBy') orderBy?: SortOrder | { $meta: "textScore"; }, @Query('sortBy') sortBy?: string,@Query('brandIds') brandIds?: Types.ObjectId[],@Query('categoryIds') categoryIds?: Types.ObjectId[],  ) {
-    return this.ProductService.getProducts( searchTerm, page, orderBy, sortBy, brandIds, categoryIds, )
+  async getAll(
+    @Query('_searchTerm') searchTerm?: string,
+    @Query('_limit') limit?: string,
+    @Query('_page') page?: string,
+    @Query('_sort') sort?: string,
+    @Query('_order') order?: SortOrder | { $meta: "textScore"; },
+    @Query('_brand') brand?: string,
+    @Query('_category') category?: string,
+      ) {
+    return this.ProductService.getProducts(searchTerm, limit, page, sort, order, brand, category)
   }
 
 

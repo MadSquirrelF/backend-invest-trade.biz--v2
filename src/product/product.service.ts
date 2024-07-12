@@ -18,56 +18,50 @@ export class ProductService {
     return doc
   }
 
+  async getCalculation(data: CreateProductDto) {
+    
+  }
 
-  async getProducts( searchTerm?: string, page?: string, orderBy?: SortOrder | { $meta: "textScore"; }, sortBy?: string, brandIds?: Types.ObjectId[], categoryIds?: Types.ObjectId[] ,) {
 
-    let options = {}
-    if (categoryIds) {
-      if (searchTerm) {
-        options = {category: { $in: categoryIds }, $or: [{ title: new RegExp(searchTerm, 'i') }] }
-      } else {
-        options = { category: { $in: categoryIds }  } 
-      }
-    } else if (brandIds) {
-      if (searchTerm) {
-        options = { brand: { $in: brandIds }, $or: [{ title: new RegExp(searchTerm, 'i') }]  }
-      } else {
-        options = { brand: { $in: brandIds }  }
-      }
-    }
-    else if (searchTerm) options = { $or: [{ title: new RegExp(searchTerm, 'i') }] }
-    else {
-      options = {}
+  async getProducts(searchTerm?: string, limit?: string, page?: string, sort?: string, order?: SortOrder | { $meta: "textScore"; }, brandName?: string, categoryName?: string) {
+    let base = this.productModel.find({});
+
+    if (categoryName) {
+      base.where('category').equals(categoryName);
     }
 
+    if (brandName) {
+      base.where('brand').equals(brandName);
+    }
 
-    const query = this.productModel.find(options) 
-    const total = await this.productModel.count(options).exec()
-    const pageOf = parseInt(page) || 1
+    if (searchTerm) {
+      base.where('title').regex(new RegExp(searchTerm, 'i'));
+    }
+
+    const options = base.getQuery();
+
+    const query = this.productModel.find(options);
+
+    const pageOf = parseInt(page) || 1;
+		const limitOf = parseInt(limit) || 6;
 
 
-    if (sortBy && orderBy) {
-      if (sortBy === 'title') {
-        query.sort({ 'title': orderBy })
+    if (sort && order) {
+      if (sort === 'title') {
+        query.sort({ 'title': order })
       }
-      else if (sortBy === 'rating') {
-        query.sort({ 'rating': orderBy })
+      else if (sort === 'rating') {
+        query.sort({ 'rating': order })
       }
       else {
-        query.sort({ 'countOpened': orderBy })
+        query.sort({ 'view_count': order })
       }
     }
 
-    const limit = 6
 
-    const data = await query.skip((pageOf - 1) * limit).limit(limit).populate('category add brand').exec()
+    const data = await query.skip((pageOf - 1) * limitOf).limit(limitOf).exec();
 
-    return {
-      data,
-      total,
-      pageOf,
-      last_page: Math.ceil(total / limit)
-    }
+    return data
   }
 
   async byCategory(categoryIds: Types.ObjectId[]) {
@@ -107,10 +101,10 @@ export class ProductService {
 
   async update(_id: string, dto: CreateProductDto) {
 
-    if (!dto.isSendTelegram) {
-      await this.sendNotification(dto)
-      dto.isSendTelegram = true
-    }
+    // if (!dto.isSendTelegram) {
+    //   await this.sendNotification(dto)
+    //   dto.isSendTelegram = true
+    // }
     const updateDoc = await this.productModel.findByIdAndUpdate(_id, dto, { new: true }).exec()
 
     if (!updateDoc) throw new NotFoundException('Product not found')
@@ -120,12 +114,11 @@ export class ProductService {
 
   async create() {
     const defaultValue: CreateProductDto = {
-      image: '',
+      poster: '',
       title: '',
       slug: '',
       is_available: true,
-      description_short: '',
-      description_full: '',
+      description: '',
       details: [
         {
           name: '',
@@ -136,9 +129,12 @@ export class ProductService {
           value: ''
         }
       ],
-      brand: [],
+      brand: '',
       add: [],
-      category: [],
+      category: '',
+      rating: 0,
+      view_count: 0,
+      price: 0,
     }
 
     const Product = await this.productModel.create(defaultValue)
