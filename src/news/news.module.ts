@@ -5,6 +5,7 @@ import { NewsModel } from './news.model';
 import { TypegooseModule } from 'nestjs-typegoose';
 import { TelegramModule } from 'src/telegram/telegram.module';
 import { UserModel } from 'src/user/user.model';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [TypegooseModule.forFeature([{
@@ -12,7 +13,7 @@ import { UserModel } from 'src/user/user.model';
     schemaOptions: {
       collection: 'News'
     }
-  }]), TelegramModule, UserModel],
+  }]), TelegramModule, UserModel, UserModule],
   providers: [NewsService],
   controllers: [NewsController],
   exports: [NewsService]

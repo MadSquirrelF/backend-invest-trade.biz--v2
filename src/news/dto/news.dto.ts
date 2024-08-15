@@ -22,7 +22,12 @@ export class NewsDto {
 	slug: string;
 
 	@IsString()
-	subtitle: string
+	subtitle: string;
+
+	likes?: number;
+
+	@IsString()
+  category: string;
 
 	blocks: NewBlock[]
 

@@ -15,11 +15,11 @@ export class AuthService {
 
   async login(dto: LoginDto) {
 
-    const recaptchaResponse = await axios.post(`https://smartcaptcha.yandexcloud.net/validate?secret=${process.env.YANDEX_CAPTCHA_SECRET_KEY}&token=${dto.token}`);
+    // const recaptchaResponse = await axios.post(`https://smartcaptcha.yandexcloud.net/validate?secret=${process.env.YANDEX_CAPTCHA_SECRET_KEY}&token=${dto.token}`);
 
-    if (recaptchaResponse.data.status === 'failed') {
-       throw new BadRequestException(recaptchaResponse.data.message);
-    }
+    // if (recaptchaResponse.data.status === 'failed') {
+    //    throw new BadRequestException(recaptchaResponse.data.message);
+    // }
 
     const user = await this.validateUser(dto)
 

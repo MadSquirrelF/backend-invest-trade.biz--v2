@@ -52,9 +52,9 @@ export class LoginDto {
   password: string
 
   
-  @IsNotEmpty({
-    message: 'reCaptcha token can not be empty'
-  })
-  @IsString()
-  token: string;
+  // @IsNotEmpty({
+  //   message: 'reCaptcha token can not be empty'
+  // })
+  // @IsString()
+  // token: string;
 }

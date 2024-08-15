@@ -1,11 +1,11 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { IdValidationPipe } from 'src/pipes/id.validation.pipe';
-import { User } from 'src/user/decorators/user.decorator';
-import { UserModel } from 'src/user/user.model';
 import { NewsDto } from './dto/news.dto';
 import { NewsService } from './news.service';
 import { SortOrder } from 'mongoose';
+import { User } from 'src/user/decorators/user.decorator';
+import { UserModel } from 'src/user/user.model';
 
 @Controller('news')
 export class NewsController {
@@ -17,9 +17,10 @@ export class NewsController {
   @Query('_limit') limit?: string,
   @Query('_page') page?: string,
   @Query('_sort') sort?: string,
+  @Query('_date') date?: string,
   @Query('_order') order?: SortOrder | { $meta: "textScore"; },
   ) {
-    return this.NewService.getAll(searchTerm, limit, page, sort, order)
+    return this.NewService.getAll(searchTerm, limit, page, sort, order, date)
   }
 
   @Get('details/:id')
@@ -42,8 +43,8 @@ export class NewsController {
   @Post()
   @HttpCode(200)
   @Auth('ADMIN')
-  async create() {
-    return this.NewService.create()
+  async create(@User() user: UserModel) {
+    return this.NewService.create(user)
   }
 
   @Put('update-count-opened')

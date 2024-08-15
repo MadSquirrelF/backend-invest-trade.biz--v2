@@ -5,6 +5,7 @@ import { TelegramService } from 'src/telegram/telegram.service'
 import { NewsDto } from './dto/news.dto'
 import { NewsModel } from './news.model'
 import { SortOrder } from 'mongoose'
+import { UserModel } from 'src/user/user.model'
 
 @Injectable()
 export class NewsService {
@@ -19,10 +20,17 @@ export class NewsService {
     return New
   }
 
-	async getAll(searchTerm?: string, limit?: string, page?: string, sort?: string, order?: SortOrder | { $meta: "textScore"; },) {
+	async getAll(searchTerm?: string, limit?: string, page?: string, sort?: string, order?: SortOrder | { $meta: "textScore"; }, date?: string) {
 		let options = {}
 
 		if (searchTerm) options = { $or: [{ title: new RegExp(searchTerm, 'i') }] }
+
+		   // Обработка параметра date
+		if (date && date !== "all") {
+        const startDate = new Date(`${date}-01-01T00:00:00Z`); // Начало года
+        const endDate = new Date(`${date}-12-31T23:59:59Z`); // Конец года
+        options = { ...options, createdAt: { $gte: startDate, $lte: endDate } };
+    }
 
 		const query = this.NewsModel.find(options);
 
@@ -41,9 +49,19 @@ export class NewsService {
 			}
 		}
 
-		const data = await query.skip((pageOf - 1) * limitOf).limit(limitOf).exec()
+		// Получение данных с пагинацией
+		const data = await query.skip((pageOf - 1) * limitOf).limit(limitOf).exec();
 
-		return data;
+		// Подсчет общего количества документов для вычисления количества страниц
+		const totalCount = await this.NewsModel.countDocuments(options).exec();
+		const totalPages = Math.ceil(totalCount / limitOf);
+
+		return {
+			data,
+			totalPages,
+			currentPage: pageOf,
+			totalCount
+		};
 	}
 
 	async updateCountOpened(id: string) {
@@ -69,10 +87,10 @@ export class NewsService {
 
 
 	async update(_id: string, dto: NewsDto) {
-		if (!dto.isSendTelegram) {
-			await this.sendNotification(dto)
-			dto.isSendTelegram = true
-		}
+		// if (!dto.isSendTelegram) {
+		// 	await this.sendNotification(dto)
+		// 	dto.isSendTelegram = true
+		// }
 		const updateDoc = await this.NewsModel.findByIdAndUpdate(_id, dto, {
 			new: true,
 		}).exec()
@@ -82,18 +100,21 @@ export class NewsService {
 		return updateDoc
 	}
 
-	async create() {
-		const defaultValue: NewsDto = {
+	async create(user: UserModel) {
+		const defaultValue = {
 			title: '',
 			slug: '',
 			subtitle: '',
-			preview_img: '/uploads/news/default_new.png',
+			preview_img: '/uploads/news/default.jpg',
 			views: 0,
-			blocks: []
+			blocks: [],
+			likes: 0,
+			category: '',
+			author: this.returnUserFields(user),
 		}
 
-		const Add = await this.NewsModel.create(defaultValue)
-		return Add._id
+		const New = await this.NewsModel.create(defaultValue)
+		return New._id
 	}
 
 	async delete(id: string) {
@@ -124,4 +145,12 @@ export class NewsService {
 			},
 		})
 	}
+
+	returnUserFields(user: UserModel) {
+    return {
+      _id: user._id,
+      avatar: user.avatar,
+      username: user.username,
+    }
+  }
 }

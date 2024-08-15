@@ -20,16 +20,29 @@ export class NewBlock {
 
 export class NewsModel extends TimeStamps {
 	@prop()
-	title: string
+	title: string;
 
 	@prop()
 	slug: string;
 
 	@prop()
-	subtitle: string
+	subtitle: string;
 
 	@prop()
-	blocks: NewBlock[]
+	author: {
+			_id: string;
+			avatar: string;
+			username: string;
+	};
+
+	@prop({ default: 0 })
+	likes: number;
+
+	@prop()
+	category: string;
+
+	@prop()
+	blocks: NewBlock[];
 
 	@prop()
 	preview_img: string;
